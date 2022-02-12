@@ -5,15 +5,11 @@ const main = async () => {
   console.log("Deploying contracts with account: ", deployer.address);
   console.log("Account balance: ", accountBalance.toString());
 
-  const hotDogContractFactory = await hre.ethers.getContractFactory(
-    "HotDogSender"
-  );
-  const hotDogContract = await hotDogContractFactory.deploy({
-    value: hre.ethers.utils.parseEther("0.1"),
-  });
-  await hotDogContract.deployed();
+  const pokeFactory = await hre.ethers.getContractFactory("Poke");
+  const poke = await pokeFactory.deploy({});
+  await poke.deployed();
 
-  console.log("HotDogPortal address: ", hotDogContract.address);
+  console.log("Poke address: ", poke.address);
 };
 
 const runMain = async () => {
