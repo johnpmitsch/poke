@@ -1,14 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { ethers } from "ethers";
 import Jazzicon from "jazzicon";
 import detectEthereumProvider from "@metamask/detect-provider";
-import Poke from "../artifacts/contracts/Poke.sol/Poke.json";
+import MainContent from "./MainContent";
 import "./App.css";
 
-const contractAddress = "0x9Ec5DcC70c44C571857b5757DbC20078eEbEcbA3";
-
 const WAGMI_PARAMS = {
-  chainId: "11111",
+  chainId: "0x2B67",
   chainName: "Avalanche WAGMI subnet",
   nativeCurrency: {
     name: "WAGMI",
@@ -16,7 +13,6 @@ const WAGMI_PARAMS = {
     decimals: 18,
   },
   rpcUrls: ["https://api.trywagmi.xyz/rpc"],
-  blockExplorerUrls: [""],
 };
 
 export const shortenedAddress = (address) => {
@@ -33,7 +29,7 @@ function App() {
   const [userAddress, setUserAddress] = useState(null);
 
   const avatarRef = useRef(null);
-  const targetChainId = 11111;
+  const targetChainId = "0x2b67";
 
   const jsNumberForAddress = (address) => {
     const addr = address.slice(2, 10);
@@ -43,33 +39,6 @@ function App() {
   const generateNewIdenticon = (address, diameter = 20) => {
     const numericRepresentation = jsNumberForAddress(address);
     return Jazzicon(diameter, numericRepresentation);
-  };
-
-  useEffect(() => {
-    if (wallet?.chainId) setChainId(wallet.chainId);
-  }, [wallet]);
-
-  useEffect(() => {
-    if (!wallet) return;
-    wallet.on("chainChanged", function (networkId) {
-      setChainId(networkId);
-      if (wallet?.selectedAddress) setUserAddress(wallet.selectedAddress);
-    });
-  }, [wallet]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (avatarRef?.current?.firstChild)
-      avatarRef.current.removeChild(avatarRef.current.firstChild);
-    if (userAddress)
-      avatarRef?.current?.appendChild(generateNewIdenticon(userAddress));
-  }, [userAddress, chainId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const switchToAvalanche = () => {
-    const networkParams = WAGMI_PARAMS;
-    wallet.request({
-      method: "wallet_addEthereumChain",
-      params: [networkParams],
-    });
   };
 
   useEffect(() => {
@@ -91,18 +60,38 @@ function App() {
     });
   }, [wallet]);
 
+  useEffect(() => {
+    if (wallet?.chainId) setChainId(wallet.chainId);
+  }, [wallet]);
+
+  useEffect(() => {
+    if (!wallet) return;
+    wallet.on("chainChanged", function (networkId) {
+      setChainId(networkId);
+      if (wallet?.selectedAddress) setUserAddress(wallet.selectedAddress);
+    });
+  }, [wallet]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (avatarRef?.current?.firstChild)
+      avatarRef.current.removeChild(avatarRef.current.firstChild);
+    if (userAddress)
+      avatarRef?.current?.appendChild(generateNewIdenticon(userAddress));
+  }, [userAddress, chainId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // couldn't get to work
+  // Request for method 'eth_chainId on https://api.trywagmi.xyz/rpc failed
+  const switchToAvalanche = () => {
+    const networkParams = WAGMI_PARAMS;
+    wallet.request({
+      method: "wallet_addEthereumChain",
+      params: [networkParams],
+    });
+  };
+
   async function connectWallet() {
     if (typeof window.ethereum === "undefined") return;
     await requestAccount();
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    const contract = new ethers.Contract(contractAddress, Poke.abi, signer);
-    if (contract) {
-      const interactions = await contract.getInteractionsForAddress(
-        userAddress
-      );
-    }
   }
 
   async function requestAccount() {
@@ -126,11 +115,13 @@ function App() {
       return (
         <>
           <button onClick={switchToAvalanche}>
-            {"Switch to WAGMI Subnet"}
+            Switch to Avalanche WAGMI subnet
           </button>
         </>
       );
     }
+
+    return <MainContent wallet={wallet} userAddress={userAddress} />;
   };
 
   return (
