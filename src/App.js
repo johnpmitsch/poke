@@ -126,7 +126,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Poke</h1>
+      <div class="text-3xl">Poke</div>
       {getWalletButtons()}
     </div>
   );

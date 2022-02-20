@@ -34,13 +34,21 @@ function MainContent({ wallet, userAddress }) {
 
   return (
     <>
-      <h2>Welcome to WAGMI Poke</h2>
       <h3>Poke someone</h3>
-      <input
-        value={addressToPoke}
-        onChange={(e) => setAddressToPoke(e.target.value)}
-      />
-      <button onClick={() => poke(addressToPoke)}>Poke</button>
+      <div class="m-8 flex">
+        <input
+          className="rounded-l-md p-4 border-t mr-0 border-b border-l text-gray-800 text-sm border-gray-200 bg-white"
+          placeholder="0x3f17f1962B36e491b30A40b2405849e597Ba5FB5"
+          value={addressToPoke}
+          onChange={(e) => setAddressToPoke(e.target.value)}
+        />
+        <button
+          className="px-8 rounded-r-lg bg-green-400 text-gray-800 font-bold p-4 uppercase border-green-500 border-t border-b border-r"
+          onClick={() => poke(addressToPoke)}
+        >
+          Poke
+        </button>
+      </div>
       <h3>Your pokes</h3>
       {pokes.length === 0 && !loadingPokes && <p>No one has poked you :(</p>}
       {pokes.map((poker, i) => (
